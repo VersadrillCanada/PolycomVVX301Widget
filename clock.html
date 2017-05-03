@@ -1,0 +1,122 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <title>Polycom VVX écran de veille | widget </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body,html{
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        table{
+            margin-top: -10px;
+            margin-left: -10px;
+            width: 100%; height: 100%; text-align: center;
+        }
+        td {
+            height: 100%; font-size:12px; vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<table >
+    <tr>
+        <td id="meteoWidget"></td>
+        <td id="dateWidget"></td>
+    </tr>
+</table>
+</body>
+<script>
+    /**
+     * Id des conteneurs pour les widgets
+     */
+    var meteoWidgetId = "meteoWidget";
+    var dateWidgetId = "dateWidget";
+
+    /**
+     * Pour changer la ville il faut changer l'id 'forecast?id=xxxxxxx' dans l'url.
+     * Pour trouver l'id chercher votre ville dans ce fichier http://bulk.openweathermap.org/sample/city.list.json.gz
+     * information provient de http://openweathermap.org/
+     */
+    var weatherUrl = "http://api.openweathermap.org/data/2.5/forecast?id=6173017&appid=bafcefdeac8d50e4d3a7ef8aac9cc258&lang=fr&units=metric";
+    /**
+     * Initialise les widgets
+     */
+    dateWidget();
+    meteoWidget();
+
+    /**
+     * Reload la date à toute les seconde
+     */
+    setInterval(dateWidget, 1000);
+
+    /**
+     * Reload la meteo à toute les 15 minutes
+     */
+    setInterval(meteoWidget, 1000 * 60 * 15);
+
+    /**
+     * Date Widget
+     */
+    function dateWidget() {
+        var dayList = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        var d = new Date();
+        var x = document.getElementById(dateWidgetId);
+        var weekDay = dayList[d.getDay()];
+        var date = addZero(d.getUTCDate());
+        var month = addZero(d.getUTCMonth());
+        var year = d.getFullYear();
+        var h = addZero(d.getHours());
+        var m = addZero(d.getMinutes());
+        var s = addZero(d.getSeconds());
+        x.innerHTML = weekDay + "<br>" + date + "-" + month + "-" + year + "<br>" + h + ":" + m + ":" + s;
+    }
+
+    /**
+     * Meteo Widget
+     */
+    function meteoWidget() {
+        var weatherData = [];
+        getData(weatherUrl, function (data) {
+            weatherData.push(data);
+            console.log(weatherData[0]);
+            var location = weatherData[0].city;
+            var temperature = weatherData[0].list[0].main.temp;
+            var condition = weatherData[0].list[0].weather[0].description;
+            var content = location.name + '</br>';
+            content += Math.round(temperature) + '&deg' + 'c</br>';
+            content += condition;
+            document.getElementById(meteoWidgetId).innerHTML = content;
+        });
+    }
+
+    /**
+     * Execute l'appel Ajax
+     */
+    function getData(weatherUrl, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var data = JSON.parse(xhr.responseText);
+                callback(data);
+            }
+        };
+        xhr.open('GET', weatherUrl, true);
+        xhr.send();
+    }
+
+    /**
+     * Ajoute un 0 sur le nombre contient seulement un chiffre
+     */
+    function addZero(i) {
+        if (i < 10) {
+            i = "0" + i;
+        }
+        return i;
+    }
+</script>
+</html>
