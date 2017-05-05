@@ -13,8 +13,6 @@
             width: 100%;
         }
         table{
-            margin-top: -10px;
-            margin-left: -10px;
             width: 100%; height: 100%; text-align: center;
         }
         td {
@@ -64,11 +62,11 @@
      */
     function dateWidget() {
         var dayList = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-        var d = new Date();
+        var d = new Date;
         var x = document.getElementById(dateWidgetId);
         var weekDay = dayList[d.getDay()];
-        var date = addZero(d.getUTCDate());
-        var month = addZero(d.getUTCMonth());
+        var date = addZero(d.getDate());
+        var month = addZero(d.getMonth()+1);
         var year = d.getFullYear();
         var h = addZero(d.getHours());
         var m = addZero(d.getMinutes());
